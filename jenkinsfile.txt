@@ -1,0 +1,13 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Execute') {
+            steps {
+                echo 'Running Hospital Appointment Management System'
+                bat 'python app.py'   // Windows
+                // sh 'python3 app.py' // Linux
+            }
+        }
+    }
+}
