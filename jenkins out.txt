@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JDK17'
+        maven 'Maven3'
+    }
+
+    environment {
+        APP_NAME = "HospitalAppointmentManagementSystem"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo "Checking out source code..."
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building the application..."
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Running unit tests..."
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo "Packaging application..."
+                sh 'mvn package'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying application..."
+                sh '''
+                mkdir -p /opt/hospital-app
+                cp target/*.jar /opt/hospital-app/
+                echo "Deployment Successful"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully."
+        }
+        failure {
+            echo "Pipeline failed."
+        }
+    }
+}
